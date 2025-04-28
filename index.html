@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Escala de Sonolência de Epworth</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    h2 {
+      color: #004080;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    .resultado {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Escala de Sonolência de Epworth</h2>
+
+  <form id="epworthForm">
+    <div id="perguntas"></div>
+    <button type="button" onclick="calcularEpworth()">Calcular Resultado</button>
+  </form>
+
+  <div class="resultado" id="resultado" style="display:none;"></div>
+
+  <script>
+    const perguntas = [
+      "Sentado e lendo",
+      "Assistindo TV",
+      "Sentado inativo em local público (ex: teatro ou reunião)",
+      "Como passageiro de carro por 1 hora sem parada",
+      "Deitado para descansar à tarde quando possível",
+      "Sentado conversando com alguém",
+      "Sentado calmamente após almoço (sem bebida alcoólica)",
+      "No trânsito, parado por alguns minutos no carro"
+    ];
+
+    const opcoes = [
+      { texto: "Nenhuma chance de cochilar", valor: 0 },
+      { texto: "Pequena chance de cochilar", valor: 1 },
+      { texto: "Chance moderada de cochilar", valor: 2 },
+      { texto: "Grande chance de cochilar", valor: 3 }
+    ];
+
+    function criarFormulario() {
+      const container = document.getElementById('perguntas');
+
+      perguntas.forEach((pergunta, index) => {
+        const div = document.createElement('div');
+        div.className = 'question';
+
+        const label = document.createElement('label');
+        label.innerText = pergunta;
+        div.appendChild(label);
+
+        opcoes.forEach(opcao => {
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `q${index}`;
+          radio.value = opcao.valor;
+          div.appendChild(radio);
+
+          const txt = document.createTextNode(` ${opcao.texto}`);
+          const line = document.createElement('div');
+          line.style.marginLeft = "15px";
+          line.appendChild(radio);
+          line.appendChild(txt);
+          div.appendChild(line);
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    function calcularEpworth() {
+      let total = 0;
+      let respondidas = 0;
+
+      perguntas.forEach((_, index) => {
+        const opcoes = document.getElementsByName(`q${index}`);
+        for (let opc of opcoes) {
+          if (opc.checked) {
+            respondidas++;
+            total += parseInt(opc.value);
+          }
+        }
+      });
+
+      if (respondidas < 8) {
+        alert("Por favor, responda todas as perguntas.");
+        return;
+      }
+
+      const interpretacao = () => {
+        if (total <= 10) return "Sonolência normal";
+        if (total <= 14) return "Sonolência leve";
+        if (total <= 18) return "Sonolência moderada";
+        return "Sonolência severa";
+      };
+
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = `
+        <h3>Resultado:</h3>
+        <p><strong>Escore total:</strong> ${total}</p>
+        <p><strong>Classificação:</strong> ${interpretacao()}</p>
+      `;
+      resultado.style.display = "block";
+    }
+
+    window.onload = criarFormulario;
+  </script>
+
+</body>
+</html>
